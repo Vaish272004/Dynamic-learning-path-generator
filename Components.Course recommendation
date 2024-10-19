@@ -1,0 +1,44 @@
+import React from 'react';
+import { User, Course } from '../types';
+import { BookOpen } from 'lucide-react';
+
+interface CourseRecommendationProps {
+  user: User;
+  courses: Course[];
+}
+
+const CourseRecommendation: React.FC<CourseRecommendationProps> = ({ user, courses }) => {
+  const recommendCourses = (user: User, courses: Course[]): Course[] => {
+    const userInterests = new Set(user.interests);
+    const completedCourses = new Set(user.completedCourses);
+    
+    return courses
+      .filter(course => !completedCourses.has(course.id))
+      .sort((a, b) => {
+        const aRelevance = a.tags.filter(tag => userInterests.has(tag)).length;
+        const bRelevance = b.tags.filter(tag => userInterests.has(tag)).length;
+        return bRelevance - aRelevance;
+      })
+      .slice(0, 3);
+  };
+
+  const recommendedCourses = recommendCourses(user, courses);
+
+  return (
+    <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <h2 className="text-2xl font-bold mb-4">Recommended Courses</h2>
+      {recommendedCourses.map(course => (
+        <div key={course.id} className="mb-4 p-4 border rounded">
+          <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+          <p className="text-gray-600 mb-2">{course.description}</p>
+          <div className="flex items-center">
+            <BookOpen className="mr-2" size={18} />
+            <span className="text-sm font-medium text-blue-600">{course.level}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default CourseRecommendation;
