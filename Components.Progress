@@ -1,0 +1,36 @@
+import React from 'react';
+import { User, UserProgress } from '../types';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+interface ProgressDashboardProps {
+  user: User;
+  progress: UserProgress[];
+}
+
+const ProgressDashboard: React.FC<ProgressDashboardProps> = ({ user, progress }) => {
+  const userProgress = progress.filter(p => p.userId === user.id);
+
+  const data = userProgress.map(p => ({
+    courseId: p.courseId,
+    progress: p.progress,
+    averageQuizScore: Object.values(p.quizScores).reduce((a, b) => a + b, 0) / Object.values(p.quizScores).length || 0,
+  }));
+
+  return (
+    <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <h2 className="text-2xl font-bold mb-4">Progress Dashboard</h2>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="courseId" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="progress" fill="#8884d8" name="Course Progress" />
+          <Bar dataKey="averageQuizScore" fill="#82ca9d" name="Average Quiz Score" />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+export default ProgressDashboard;
